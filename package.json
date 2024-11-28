@@ -1,10 +1,10 @@
 {
   "name": "new-folder",
   "version": "1.0.0",
-  "main": "extra.js",
+  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start":"node extra.js"
+    "start": "node index.js"
   },
   "keywords": [],
   "author": "",
@@ -15,6 +15,7 @@
     "cors": "^2.8.5",
     "express": "^4.21.1",
     "fs": "^0.0.1-security",
-    "mongoose": "^8.8.2"
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.8.3"
   }
 }
