@@ -13,8 +13,8 @@ mongoose
   .catch((err) => console.error("MongoDB connection error:", err));
 
 const DataSchema = new mongoose.Schema({}, { strict: false });
-const DataModelRu = mongoose.model("ru", DataSchema);
 const DataModelEn = mongoose.model("en", DataSchema);
+const DataModelRu = mongoose.model("ru", DataSchema);
 
 app.use(cors());
 app.use(express.json());
@@ -26,7 +26,8 @@ app.get("/api/:lang", async (req, res) => {
 
   try {
     const data = await DataModel.find();
-    res.json(data);
+
+    res.json(data); 
   } catch (err) {
     res.status(500).json({ message: "Error fetching data", error: err });
   }
@@ -38,17 +39,18 @@ app.get("/api/:lang/:id", async (req, res) => {
   const DataModel = lang === "ru" ? DataModelRu : DataModelEn;
 
   try {
-    const data = await DataModel.findOne({ [`${id}`]: { $exists: true } }); 
+    const data = await DataModel.find({ [`${id}`]: { $exists: true } }); 
 
-    if (data) {
-      const result = data[id];
-      if (result) {
-        res.json(result);
-      } else {
-        res.status(404).json({ message: `Data for id ${id} not found` });
-      }
+    if (data.length > 0) {
+      const result = data.flatMap((item) => {
+        return Object.keys(item[id]).map((key) => {
+          return { key: key, value: item[id][key] }; 
+        });
+      });
+
+      res.json(result); 
     } else {
-      res.status(404).json({ message: "Data not found" });
+      res.status(404).json({ message: `Data for id ${id} not found` });
     }
   } catch (err) {
     res.status(500).json({ message: "Error fetching data", error: err });
@@ -56,10 +58,9 @@ app.get("/api/:lang/:id", async (req, res) => {
 });
 
 app.post("/api/:lang/update-word", async (req, res) => {
-  const { lang } = req.params;
+  const { lang } = req.params; 
   const { wordKey, targetKey, newValue } = req.body;
 
-  
   const DataModel = lang === "ru" ? DataModelRu : DataModelEn;
 
   try {
